@@ -10,7 +10,7 @@ on:
 # Environment variables available to all jobs and steps in this workflow.
 env: 
   REGISTRY: ghcr.io
-  NAMESPACE: teksial
+  NAMESPACE: hbo-partners
 
 jobs:
   build:
