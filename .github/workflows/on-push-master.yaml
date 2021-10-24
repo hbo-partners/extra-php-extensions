@@ -1,0 +1,38 @@
+# Matric deployment
+# https://github.com/brefphp/extra-php-extensions/blob/master/.github/workflows/deploy-docker.yml
+name: Build and Deploy package
+
+on:
+  push:
+    branches:
+    - master
+
+# Environment variables available to all jobs and steps in this workflow.
+env: 
+  REGISTRY: ghcr.io
+  NAMESPACE: teksial
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Build & Staging test
+    - name: Build
+      run: make docker-images
+
+    # Tagging before push to registry
+    - name: Tagging
+      run: |
+        docker tag bref/layers/psr-php-74:latest "$REGISTRY/$NAMESPACE/extra-php-extensions/psr-php-74:latest"
+        docker tag bref/layers/phalcon-php-74:latest "$REGISTRY/$NAMESPACE/extra-php-extensions/phalcon-php-74:latest"
+
+    # Push github packages
+    - name: Login Github.com & Push
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login https://$REGISTRY --username ${{ github.actor }} --password-stdin
+        docker push "$REGISTRY/$NAMESPACE/extra-php-extensions/psr-php-74:latest"
+        docker push "$REGISTRY/$NAMESPACE/extra-php-extensions/phalcon-php-74:latest"
